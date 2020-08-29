@@ -1,4 +1,6 @@
 const playwright = require('playwright');
+const compareImages = require('resemblejs/compareImages');
+const fs = require('mz/fs');
 
 const PAGE_URL = 'http://localhost:4200/';
 const cookies = [{
@@ -6,6 +8,57 @@ const cookies = [{
   name: 'doggo',
   value: 'woofs',
 }];
+
+async function getDiff(screenshot, ref) {
+  const options = {
+      output: {
+          errorColor: {
+              red: 255,
+              green: 0,
+              blue: 255
+          },
+          errorType: 'movement',
+          transparency: 0.3,
+          largeImageThreshold: 1200,
+          useCrossOrigin: false,
+          outputDiff: true
+      },
+      scaleToSameSize: true,
+      ignore: 'antialiasing'
+  };
+
+  // The parameters can be Node Buffers
+  // data is the same as usual with an additional getBuffer() function
+  const data = await compareImages(
+      await fs.readFile('./src/vrtest/refs/' + ref + '.png'),
+      await fs.readFile('./src/vrtest/screenshots/' + screenshot + '.png'),
+      options
+  );
+
+  console.log(data);
+  // { isSameDimensions: true,
+  //   dimensionDifference: { width: 0, height: 0 },
+  //   rawMisMatchPercentage: 0,
+  //   misMatchPercentage: '0.00',
+  //   diffBounds: { top: 1024, left: 1280, bottom: 0, right: 0 },
+  //   analysisTime: 93,
+  //   getImageDataUrl: [Function],
+  //   getBuffer: [Function] }
+
+  await fs.writeFile('./src/vrtest/diffs/diff-' + screenshot + '.png', data.getBuffer());
+
+  return analyzeResult(data);
+}
+
+function analyzeResult(data) {
+  if (data.isSameDimensions &&
+    data.rawMisMatchPercentage === 0 &&
+    data.misMatchPercentage === '0.00'
+  ) {
+    return true;
+  }
+  return false;
+}
 
 // Loop over all the supported browsers
 for (const browserType of ['chromium', 'firefox']) { // 'firefox', 'webkit'
@@ -37,7 +90,6 @@ for (const browserType of ['chromium', 'firefox']) { // 'firefox', 'webkit'
         }
       });
 
-
       // Open the page
       await page.goto(PAGE_URL);
     });
@@ -47,16 +99,18 @@ for (const browserType of ['chromium', 'firefox']) { // 'firefox', 'webkit'
     });
 
     it(`(${browserType}): Should load page`, async () => {
-      expect(page).toBeNull();
+      expect(page).not.toBeNull();
       expect(await page.title()).not.toBeNull();
 
-      // await page.screenshot({ path: './src/vrtest/screenshots/' + browserType + '-' + ticks + '.png' });
+      let screenshotName = browserType + '-' + ticks;
+      await page.screenshot({ path: './src/vrtest/screenshots/' + screenshotName + '.png' });
 
       const loadedCookies = await context.cookies('http://localhost:4200/');
       console.log(JSON.stringify(loadedCookies, null, 4));
 
+      let comparedResult = await getDiff(screenshotName, browserType);
+      expect(comparedResult).toEqual(true);
     });
-
 
   });
 }
