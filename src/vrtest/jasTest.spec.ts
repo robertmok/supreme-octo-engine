@@ -8,7 +8,7 @@ const cookies = [{
 }];
 
 // Loop over all the supported browsers
-for (const browserType of ['chromium']) { // 'firefox', 'webkit'
+for (const browserType of ['chromium', 'firefox']) { // 'firefox', 'webkit'
 
   describe(`(${browserType}): UI Tests with Playwright`, () => {
     let browser = null;
@@ -47,10 +47,10 @@ for (const browserType of ['chromium']) { // 'firefox', 'webkit'
     });
 
     it(`(${browserType}): Should load page`, async () => {
-      expect(page).not.toBeNull();
+      expect(page).toBeNull();
       expect(await page.title()).not.toBeNull();
 
-      await page.screenshot({ path: './src/vrtest/screenshots/' + browserType + '-' + ticks + '.png' });
+      // await page.screenshot({ path: './src/vrtest/screenshots/' + browserType + '-' + ticks + '.png' });
 
       const loadedCookies = await context.cookies('http://localhost:4200/');
       console.log(JSON.stringify(loadedCookies, null, 4));
