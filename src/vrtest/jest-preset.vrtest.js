@@ -25,12 +25,13 @@ describe(`(${browserName}): Jest UI Tests with Playwright Preset`, () => {
     await context.addCookies(cookies);
     this.ticks = new Date().getTime();
 
+    // have to go to domain to set the local storage
     await page.goto(PAGE_URL);
-
     await page.evaluate(() => {
       localStorage.setItem('myData', 'random data here');
     });
 
+    // go to a page of domain after local storage is set 
     await page.goto(PAGE_URL);
   });
 
@@ -41,10 +42,15 @@ describe(`(${browserName}): Jest UI Tests with Playwright Preset`, () => {
     const loadedCookies = await context.cookies('http://localhost:4200/');
     console.log(JSON.stringify(loadedCookies, null, 4));
 
-    let screenshotName = browserName + '-' + deviceName + '-' + this.ticks;
-    await page.screenshot({ path: './src/vrtest/screenshots/' + screenshotName + '.png', fullPage : true });
+    // let screenshotName = browserName + '-' + deviceName + '-' + this.ticks;
+    // await page.screenshot({ path: './src/vrtest/screenshots/' + screenshotName + '.png', fullPage : true });
 
-    // let testScreenshot = await page.screenshot();
-    // expect(testScreenshot).toMatchImageSnapshot();
+    // toMatchImageSnapshot doesn't know to keep the first screenshot of each screen sizes
+    // the first screenshot was used to compare with the next screen sizes, it did not create the diff image
+    // pass custom directory to save each screen size reference image in its own folder under the browser name
+    let testScreenshot = await page.screenshot({ fullPage : true });
+    expect(testScreenshot).toMatchImageSnapshot({
+      customSnapshotsDir: './src/vrtest/__image_snapshots__/' + browserName + '/' + deviceName
+    });
   });
 });
