@@ -63,7 +63,7 @@ function analyzeResult(data) {
 // Loop over all the supported browsers
 for (const browserType of ['chromium', 'firefox', 'webkit']) {
 
-  describe(`(${browserType}): Jasmine UI Tests with Playwright`, () => {
+  describe(`(${browserType}): Jest UI Tests with Playwright`, () => {
     let browser = null;
     let context = null;
     let page = null;
