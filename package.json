@@ -10,8 +10,8 @@
     "e2e": "ng e2e",
     "pw:test": "npx ts-node ./src/vrtest/test.js",
     "pw:jastest": "jasmine ./src/vrtest/jasTest.spec.ts",
-    "pw:jestest": "jest ./src/vrtest/jest-test.spec.ts",
-    "pw:jespre": "jest"
+    "pw:jestest": "jest ./src/vrtest/jest-test.vrtest.js",
+    "pw:jespre": "jest ./src/vrtest/jest-preset.vrtest.js"
   },
   "private": true,
   "dependencies": {

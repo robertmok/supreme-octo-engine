@@ -7,11 +7,13 @@ import { Component, OnInit } from '@angular/core';
 })
 export class HomeComponent implements OnInit {
   myCookie;
+  myData;
 
   constructor() { }
 
   ngOnInit() {
     this.myCookie = document.cookie;
+    this.myData = localStorage.getItem('myData');
   }
 
 }
