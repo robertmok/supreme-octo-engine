@@ -9,8 +9,11 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { define } from "hybrids";
 import SimpleCounter from "../sample";
 
+import { AlphaModule } from './alpha/alpha.module';
+
 // Define imported web component
 define("simple-counter", SimpleCounter);
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -19,7 +22,8 @@ define("simple-counter", SimpleCounter);
   imports: [
     BrowserModule,
     AppRoutingModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    AlphaModule
   ],
   providers: [],
   bootstrap: [AppComponent],
